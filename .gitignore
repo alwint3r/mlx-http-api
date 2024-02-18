@@ -1,0 +1,9 @@
+*.pyc
+*.DS_Store
+*.swp
+*.log
+*.out
+*.pid
+*.pyo
+.env
+.nvimrc
