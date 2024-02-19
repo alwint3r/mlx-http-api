@@ -18,20 +18,34 @@ def get_model_path(model_name):
         return f"/Users/alwin/llms/mlx/{actual_model_name}"
     return actual_model_name
 
-app = FastAPI()
-
-@app.get("/insiders/models")
-async def get_all_models():
-    return { "models": list(model_alias.keys()) }
 
 class GenerateOptions(BaseModel):
     temperature: float = 0.1
     max_length: int = 100
 
 class GenerateRequest(BaseModel):
-    model: str
+    model: str = ""
     prompt: str
     options: GenerateOptions = GenerateOptions()
+
+class ChatOptions(BaseModel):
+    temperature: float = 0.1
+    max_length: int = 100
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    model: str
+    messages: List[ChatMessage]
+    options: ChatOptions = ChatOptions()
+
+app = FastAPI()
+
+@app.get("/insiders/models")
+async def get_all_models():
+    return { "models": list(model_alias.keys()) }
 
 @app.post("/api/generate")
 async def generate_text(request: GenerateRequest):
@@ -47,19 +61,6 @@ async def generate_text(request: GenerateRequest):
                         temp=request.options.temperature)
 
     return { "model": request.model, "response": response }
-
-class ChatOptions(BaseModel):
-    temperature: float = 0.1
-    max_length: int = 100
-
-class ChatMessage(BaseModel):
-    role: str
-    content: str
-
-class ChatRequest(BaseModel):
-    model: str
-    messages: List[ChatMessage]
-    options: ChatOptions = ChatOptions()
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
